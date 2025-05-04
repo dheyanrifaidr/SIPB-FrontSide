@@ -37,7 +37,7 @@ const checkOnlineStatus = async () => {
   try {
     const onlineResponse = await API.get('/online')
     if (onlineResponse.status === 200) {
-      return true
+      return onlineResponse
     }
   } catch (err) {
     console.error('Error checking online status:', err)

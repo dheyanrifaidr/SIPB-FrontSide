@@ -3,6 +3,9 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
+  <div id="app" class="font-sans bg-gray-100 text-gray-800">
+    <router-view />
+  </div>
   <router-view />
   <div>
     <a href="https://vite.dev" target="_blank">

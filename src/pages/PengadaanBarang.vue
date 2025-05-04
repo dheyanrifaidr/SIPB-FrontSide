@@ -1,30 +1,27 @@
 <template>
 <DefaultLayout>
-  <div class="p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-xl font-bold">Halaman Pengadaan Barang</h1>
-      <div v-if="alert.message" :class="alertClass" class="p-3 rounded mb-4">
-        {{ alert.message }}
-      </div>
+  <div v-if="alert.message" :class="alertClass" class="p-3 rounded mb-4">
+    {{ alert.message }}
+  </div>
 
-      <button
-        @click="showForm = !showForm"
-        class="bg-green-600 text-white px-4 py-2 rounded"
-      >
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Pengadaan Barang</h1>
+    <button
+      @click="showForm = !showForm"
+      class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+    >
       + Tambah Barang
-      </button>
-    </div>
+    </button>
+  </div>
 
     <BarangForm
       v-if="showForm"
       :editData="editItem"
       @close="resetForm"
-      @added="fetchBarang"
+      @added="handleSaved"
     />
     <BarangTable
-      :barangList="barangList"
       @edit="handleEdit"
-      @delete="handleDelete"
     />
     <table class="min-w-full bg-white border">
       <thead>
@@ -44,7 +41,6 @@
     </table>
   
   <p v-if="barangList.length === 0" class="text-gray-500 mt-4">Tidak ada barang tersedia.</p>
-  </div>
 </DefaultLayout>
 </template>
   
@@ -53,12 +49,15 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import BarangTable from '@/components/BarangTable.vue'
 import BarangForm from '@/components/BarangForm.vue'
 // import { ref } from 'vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import API from '@/lib/api'
 
 const barangList = ref([])
 const showForm = ref(false)
 const loading = ref(true)
+
+const jumlahBarang = ref(5);
+const total = computed(() => jumlahBarang.value * 2);
 
 const fetchBarang = async () => {
   const token = localStorage.getItem('auth_token')
@@ -119,6 +118,12 @@ function showAlert(message, type = 'success') {
   setTimeout(() => {
     alert.value.message = ''
   }, 3000)
+}
+function handleSaved(result) {
+  fetchBarang()
+  showForm.value = false
+  editItem.value = null
+  showAlert(result.message, result.success ? 'success' : 'error')
 }
 
 </script>

@@ -37,6 +37,8 @@
           Batal
         </button>
       </div>
+      <!-- emit('saved', {success: true, message: 'Barang berhasil disimpan'})
+      emit('saved', { success: false, message: 'Gagal menyimpan barang' }) -->
     </form>
   </div>
 </template>
