@@ -26,10 +26,12 @@ import { useRouter } from 'vue-router'
 import API from '@/lib/api'
 
 const router = useRouter()
+
 const loginForm = ref({
   login: '',
   password: ''
 })
+
 const errorMsg = ref('')
 
 // Function to check if API is online
@@ -47,21 +49,32 @@ const checkOnlineStatus = async () => {
 
 // Login function
 const login = async () => {
+  errorMsg.value = ''
+  const online = await checkOnlineStatus()
+  if (!online) {
+    errorMsg.value = 'Tidak dapat terhubung ke server. Periksa koneksi Anda.'
+    return
+  }
+
   try {
-    // First, check if the API is online
-    const isOnline = await checkOnlineStatus()
-    if (!isOnline) {
-      errorMsg.value = 'Tidak dapat terhubung ke server. Periksa koneksi Anda.'
-      return
-    }
-    // Proceed with login if online
     const res = await API.post('/auth/login', loginForm.value)
-    const token = res.data.token
-    localStorage.setItem('auth_token', token)
-    router.push('/') // Redirect to dashboard
+
+    if (res.data.status === true) {
+      localStorage.setItem('auth_token', res.data.token)
+      localStorage.setItem('auth_user', JSON.stringify(res.data.user))
+      const token = localStorage.getItem('auth_token')
+      console.log(token);
+      router.push('/') // atau sesuaikan dengan dashboard route kamu
+    } else {
+      errorMsg.value = res.data.message || 'Login gagal.'
+    }
   } catch (err) {
-    errorMsg.value = 'Login gagal. Periksa kembali data kamu.'
-    console.error('Login Error:', err)
-  }
+    if (err.response && err.response.status === 401) {
+      errorMsg.value = 'Login gagal. Username atau password salah.'
+    } else {
+      errorMsg.value = 'Terjadi kesalahan saat login.'
+    }
+    console.error('Login error:', err)
+  }
 }
 </script>
