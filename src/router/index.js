@@ -4,9 +4,9 @@ import PengadaanBarang from '../pages/PengadaanBarang.vue'
 import Login from '../pages/Login.vue'
 
 const routes = [
-  { path: '/', component: Dashboard },
+  { path: '/dashboard', component: Dashboard },
   { path: '/pengadaan', component: PengadaanBarang },
-  { path: '/login', component: Login }
+  { path: '/', component: Login }
 ]
 
 const router = createRouter({

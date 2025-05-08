@@ -60,7 +60,7 @@ const showAlert = (message, type = 'success') => {
 
 const handleSaved = (result) => {
   resetForm()
-  showAlert(result.message, result.success ? 'success' : 'error')
-  barangTable.value?.fetchBarang()
+  showAlert(result.message || 'Terjadi Kesalahan', result.success ? 'success' : 'error')
+  if (result.success) barangTable.value?.fetchBarang()
 }
 </script>

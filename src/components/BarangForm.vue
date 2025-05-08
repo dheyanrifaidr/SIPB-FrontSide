@@ -76,6 +76,7 @@ const submitForm = async () => {
     resetFormData()
     emit('close')
   } catch (err) {
+    const errorMsg = err.response?.data?.message || 'Gagal menyimpan barang'
     console.error('Gagal menyimpan:', err)
     emit('saved', { success: false, message: 'Gagal menyimpan barang' })
   }
