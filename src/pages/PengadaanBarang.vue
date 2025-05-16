@@ -1,3 +1,4 @@
+//PengadaanBarang.vue
 <template>
   <DefaultLayout>
     <div v-if="alert.message" :class="alertClass" class="p-3 rounded mb-4">

@@ -5,43 +5,50 @@ function getCookie(name) {
   const value = `; ${document.cookie}`
   const parts = value.split(`; ${name}=`)
   if (parts.length === 2) return parts.pop().split(';').shift()
+  return null
 }
 
 // Buat instance axios utama
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
+  baseURL: import.meta.env.VITE_API_URL || 'https://sipb.crulxproject.com',
+  withCredentials: true, // Critical for stateful Sanctum
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
   }
 })
 
-// Interceptor untuk CSRF token otomatis disisipkan jika ada cookie XSRF
-API.interceptors.request.use(config => {
-  const xsrfToken = getCookie('XSRF-TOKEN')
-  if (xsrfToken) {
-    config.headers['X-XSRF-TOKEN'] = decodeURIComponent(xsrfToken)
-  }
-  return config
-})
+// Request interceptor with better logging
+API.interceptors.request.use(
+  config => {
+    // Add XSRF-TOKEN if available
+    const token = getCookie('XSRF-TOKEN')
+    if (token) {
+      // Decode the token before sending it
+      config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token)
 
+      // Debug: Log the token being sent
+      console.log('Sending CSRF token:', decodeURIComponent(token))
+    }
+    return config
+  },
+  error => {
+    console.error('API Request Error:', error)
+    return Promise.reject(error)
+  }
+)
+
+// Response interceptor to handle common errors
 API.interceptors.response.use(
   response => response,
-  async error => {
-    if (error.response?.status === 419) {
-      try {
-        // Ambil ulang CSRF token
-        await API.get('/sanctum/csrf-cookie')
-
-        // Ulangi request asli dengan token baru
-        const originalRequest = error.config
-        return API(originalRequest)
-      } catch (err) {
-        return Promise.reject(err)
-      }
+  error => {
+    if (error.response?.status === 401) {
+      // Unauthorized - redirect to login
+      window.location.href = '/'
+    } else if (error.response?.status === 405) {
+      console.error('Method not allowed. Check API endpoint:', error.config.url)
     }
-
     return Promise.reject(error)
   }
 )

@@ -2,11 +2,11 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-100">
     <div class="w-full max-w-sm bg-white p-6 rounded shadow">
       <h2 class="text-2xl font-bold mb-4">Login</h2>
-      <form @submit.prevent="login">
+      <form @submit.prevent="loginActivity">
         <div class="mb-4">
           <label class="block text-gray-700">Username</label>
           <input 
-            v-model="loginForm.username" 
+            v-model="username" 
             type="text" 
             name="username"
             placeholder="username"
@@ -17,7 +17,7 @@
         <div class="mb-4">
           <label class="block text-gray-700">Password</label>
           <input 
-            v-model="loginForm.password" 
+            v-model="password" 
             type="password" 
             name="password"
             placeholder="password"
@@ -40,67 +40,95 @@
 
 <script setup>
 import { ref } from 'vue'
+import API from '../lib/api'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/userStore'
-import API from '@/lib/api'
-
-// await axios.get('/sanctum/csrf-cookie')
+import { toast } from 'vue3-toastify'
+import { useUserStore } from '../stores/userStore'
 
 const router = useRouter()
-const userStore = useUserStore()
-
-const loginForm = ref({
-  username: '',
-  password: ''
-})
-
+const loading = ref(false)
+const username = ref('')
+const password = ref('')
 const errorMsg = ref('')
 
-// Login function
-const loading = ref(false)
-
-const login = async () => {
-  errorMsg.value = ''
-  loading.value = true
+async function getCsrfCookie() {
   try {
+    // Clear any existing CSRF cookie first
+    document.cookie = 'XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
 
-    const onlineResponse = await API.get('/api/v1/online')
-    if (onlineResponse.status !== 200) {
-      errorMsg.value = 'Tidak dapat terhubung ke server. Periksa koneksi Anda.'
-      return
+    // For stateful Sanctum, this endpoint sets the CSRF cookie
+    await API.get('/sanctum/csrf-cookie')
+
+    // Add a small delay to ensure cookie is set
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
+    // Verify the cookie was set
+    const token = getCookie('XSRF-TOKEN')
+    console.log('CSRF cookie obtained:', !!token)
+
+    if (!token) {
+      throw new Error('CSRF token not set')
     }
-  
-    const response = await API.post('/login', {
-      login: loginForm.value.username,
-      password: loginForm.value.password,
-    })
 
-    userStore.setUser(response.data.user)
+    return true
 
-    await router.push('/dashboard')
-  } catch (err) {
-    if (err.response?.status === 422) {
-      errorMsg.value = 'Please fill in both fields.'
-    } else if (err.response?.status === 401) {
-      errorMsg.value = 'Username or password incorrect.'
-    } else if (loginError.response?.status === 419) {
-        // // Jika token expired atau mismatch, refresh token dan coba login lagi
-        // await API.get('/sanctum/csrf-cookie')
-        // await API.post('/login', {
-        //   login: loginForm.value.username,
-        //   password: loginForm.value.password,
-        // })
-        // router.push('/dashboard')
-      errorMsg.value = 'CSRF token expired. Please try again.'
-        
-      } else {
-      errorMsg.value = 'Login failed. Please try again.'
-    }
-    console.error('Login error:', err)
-  } finally {
-    loading.value = false
-    return
+  } catch (error) {
+    console.error('Failed to get CSRF cookie:', error)
+    errorMsg.value = 'Failed to establish secure connection'
+    return false
   }
 }
 
+// Helper function to get cookie
+function getCookie(name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) {
+    return parts.pop().split(';').shift()
+  }
+  return null
+}
+
+async function loginActivity() {
+  loading.value = true
+  errorMsg.value = ''
+  
+  try {
+    // First get CSRF cookie
+    const csrfSuccess = await getCsrfCookie()
+    if (!csrfSuccess) {
+      loading.value = false
+      return
+    }
+
+    // Debug: Log all cookies
+    console.log('All cookies before login:', document.cookie)
+
+    // Debug: Log the specific CSRF token
+    const csrfToken = getCookie('XSRF-TOKEN')
+    console.log('CSRF Token before login:', csrfToken)
+  
+    // Login attempt
+    const response = await API.post('/api/login', {
+      login: username.value,
+      password: password.value,
+    })
+
+    console.log('Login successful:', response.data)
+
+    // Store user data in userStore
+    const userStore = useUserStore()
+    userStore.setUser(response.data.user)
+    
+    toast.success('Login successful!')
+    router.push('/dashboard')
+
+  } catch (error) {
+    console.error('Login failed:', error)
+    errorMsg.value = error.response?.data?.message || 'Login failed'
+    toast.error(errorMsg.value)
+  } finally {
+    loading.value = false
+  }
+}
 </script>

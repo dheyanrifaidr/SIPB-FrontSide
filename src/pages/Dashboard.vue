@@ -35,10 +35,20 @@ onMounted(() => {
 const logout = async () => {
   try {
     await API.get('/sanctum/csrf-cookie') // pastikan CSRF token fresh
-    await API.post('/logout')
+
+    const response = await API.post('/api/v1/logout')
+    console.log('Logout successful:', response.data)
+
+    //TEST
+    // const response = await API.post('/api/v1/test-logout')
+    // console.log('Test logout response:', response.data)
+
   } catch (err) {
-    // Bisa jadi sudah logout di server (401) atau token CSRF expired (419)
-    console.warn('Logout error (maybe already logged out):', err.response?.status)
+    console.warn('Logout error:', err)
+
+    //TEST
+    // console.warn('Test logout error:', err)
+
   } finally {
     userStore.clearUser()
     // Redirect ke halaman login / root
