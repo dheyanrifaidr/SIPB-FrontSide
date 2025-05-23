@@ -1,14 +1,16 @@
 <template>
   <div class="min-h-screen bg-gray-100 text-gray-800">
-    <!-- Navbar -->
-    <nav class="bg-white shadow px-6 py-4">
-      <h1 class="text-xl font-bold">SIPB - Sistem Informasi Pengadaan Barang</h1>
-    </nav>
-
-    <!-- Isi Halaman -->
-    <main class="p-6">
-      <slot />
-    </main>
+    <Sidebar />
+    <div class="flex-1" flex flex-col>
+      <Navbar />
+      <main class="p-6 overflow-y-auto flex-1">
+        <slot />
+      </main>
+    </div>
   </div>
 </template>
   
+<script setup>
+import Sidebar from '@/components/Sidebar.vue'
+import Navbar from '@/components/Navbar.vue'
+</script>

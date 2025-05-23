@@ -51,7 +51,7 @@ const jenisBarangList = ref([])
 
 const fetchJenisBarang = async () => {
   try {
-    const res = await API.get('/api/jenis-barang')
+    const res = await API.get('/api/v1/jenis-barang')
     jenisBarangList.value = res.data.data
   } catch (err) {
     console.error('Gagal mengambil jenis barang:', err)
@@ -67,10 +67,10 @@ const resetFormData = () => {
 const submitForm = async () => {
   try {
     if (props.editData) {
-      await API.put(`/api/barang/${props.editData.id_barang}`, form)
+      await API.put(`/api/v1/barang/${props.editData.id_barang}`, form)
       emit('saved', { success: true, message: 'Barang berhasil diperbarui' })
     } else {
-      await API.post('/api/barang', form)
+      await API.post('/api/v1/barang', form)
       emit('saved', { success: true, message: 'Barang berhasil ditambahkan' })
     }
     resetFormData()

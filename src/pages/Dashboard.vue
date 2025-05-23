@@ -36,7 +36,7 @@ const logout = async () => {
   try {
     await API.get('/sanctum/csrf-cookie') // pastikan CSRF token fresh
 
-    const response = await API.post('/api/v1/logout')
+    const response = await API.post('/api/logout')
     console.log('Logout successful:', response.data)
 
     //TEST

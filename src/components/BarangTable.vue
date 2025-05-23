@@ -3,7 +3,7 @@
     <div class="flex justify-end mb-4">
       <input
         v-model="search"
-        @input="fetchBarang"
+        @input="handleSearch"
         type="text"
         placeholder="Cari nama barang..."
         class="border px-3 py-2 rounded w-64"
@@ -27,40 +27,41 @@
             <td colspan="4" class="text-center py-4 text-gray-500">Tidak ada data barang</td>
           </tr>
           <tr v-for="barang in barangList" :key="barang.id_barang" class="border-b hover:bg-gray-50">
-            <td class="px-6 py-4">{{ barang.jenis_barang.nama }}</td>
+            <td class="px-6 py-4">{{ barang.jenis_barang?.nama }}</td>
             <td class="px-6 py-4">{{ barang.nama_barang }}</td>
             <td class="px-6 py-4">Rp {{ barang.harga_barang.toLocaleString('id-ID') }}</td>
             <td class="px-6 py-4 text-center space-x-2">
-              <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" @click="$emit('edit', barang)">Edit</button>
-              <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" @click="confirmDelete(barang)">Hapus</button>
+              <BaseButton variant="danger" @click="$emit('edit', barang)">Edit</BaseButton>
+              <BaseButton variant="danger" @click="confirmDelete(barang)">Hapus</BaseButton>
             </td>
           </tr>
         </tbody>
       </table>
       <div class="flex justify-center mt-4 space-x-2">
-        <button
+        <BaseButton
+          variant="secondary"
           @click="currentPage--"
           :disabled="currentPage === 1"
-          class="px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
         >
           &laquo; Sebelumnya
-        </button>
-        <button
+        </BaseButton>
+        <BaseButton
+          variant="secondary"
           @click="currentPage++"
           :disabled="currentPage === lastPage"
-          class="px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
         >
           Berikutnya &raquo;
-        </button>
+        </BaseButton>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import API from '@/lib/api'
 import { toast } from 'vue3-toastify'
+import BaseButton from './BaseButton.vue'
 
 const emit = defineEmits(['edit', 'saved'])
 const barangList = ref([])
@@ -73,13 +74,12 @@ const lastPage = ref(1)
 const fetchBarang = async () => {
   isLoading.value = true
   try {
-    const res = await API.get('/api/v1/barang')
-    // const res = await API.get('/barang', {
-    //   params: {
-    //     page: currentPage.value,
-    //     search: search.value || undefined
-    //   }
-    // })
+    const res = await API.get('/api/v1/barang', {
+      params: {
+        page: currentPage.value,
+        search: search.value || undefined
+      }
+    })
     barangList.value = res.data.data
     lastPage.value = res.data.meta.last_page
   } catch (err) {
@@ -89,11 +89,16 @@ const fetchBarang = async () => {
   }
 }
 
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchBarang()
+}
+
 const confirmDelete = async (barang) => {
   if (!confirm(`Yakin ingin menghapus barang "${barang.nama_barang}"?`)) return
 
   try {
-    await API.delete(`/barang/${barang.id_barang}`)
+    await API.delete(`/api/v1/barang/${barang.id_barang}`)
     toast.success('Barang berhasil dihapus')
     fetchBarang()
     emit('saved', { success: true, message: 'Barang berhasil dihapus' })
@@ -104,9 +109,8 @@ const confirmDelete = async (barang) => {
   }
 }
 
-// watch(currentPage, fetchBarang)
-
 onMounted(fetchBarang)
+watch(currentPage, fetchBarang)
 
 defineExpose({ fetchBarang })
 </script>
