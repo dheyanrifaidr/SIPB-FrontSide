@@ -64,7 +64,7 @@ async function getCsrfCookie() {
     
     // Verify the cookie was set
     const token = getCookie('XSRF-TOKEN')
-    console.log('CSRF cookie obtained:', !!token)
+    // console.log('CSRF cookie obtained:', !!token)
 
     if (!token) {
       throw new Error('CSRF token not set')
@@ -102,11 +102,11 @@ async function loginActivity() {
     }
 
     // Debug: Log all cookies
-    console.log('All cookies before login:', document.cookie)
+    // console.log('All cookies before login:', document.cookie)
 
     // Debug: Log the specific CSRF token
     const csrfToken = getCookie('XSRF-TOKEN')
-    console.log('CSRF Token before login:', csrfToken)
+    // console.log('CSRF Token before login:', csrfToken)
   
     // Login attempt
     const response = await API.post('/api/login', {

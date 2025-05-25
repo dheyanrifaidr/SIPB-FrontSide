@@ -1,16 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from '../pages/Dashboard.vue'
-import PengadaanBarang from '../pages/PengadaanBarang.vue'
-import Login from '../pages/Login.vue'
 import { useUserStore } from '../stores/userStore'
+import { useLoadingStore } from '../stores/loadingStore'
+
+const Dashboard = () => import('../pages/Dashboard.vue')
+const DaftarBarang = () => import('../pages/DaftarBarang.vue')
+const Login = () => import('../pages/Login.vue')
 
 const routes = [
+  // { 
+  //   path: '/', 
+  //   redirect: '/' // Add a default redirect to login
+  // },
   { 
     path: '/', 
-    redirect: '/login' // Add a default redirect to login
-  },
-  { 
-    path: '/login', 
     component: Login,
     meta: { requiresAuth: false }
   },
@@ -20,13 +22,13 @@ const routes = [
     meta: { requiresAuth: true }
   },
   { 
-    path: '/pengadaan', 
-    component: PengadaanBarang,
+    path: '/daftar-barang', 
+    component: DaftarBarang,
     meta: { requiresAuth: true }
   },
   {
-    path: '/:pathMatch(.*)*',
-    redirect: '/login'
+    path: '/:pathMatch(.)',
+    redirect: '/'
   }
 ]
 
@@ -37,6 +39,8 @@ const router = createRouter({
 
 // Add navigation guard using the existing userStore
 router.beforeEach(async (to, from, next) => {
+  const loadingStore = useLoadingStore()
+  loadingStore.isLoading = true // Set loading state to true
   const userStore = useUserStore()
 
   // Load user data from storage if not already loaded
@@ -50,19 +54,24 @@ router.beforeEach(async (to, from, next) => {
     await userStore.validateSession()
     
     if (!userStore.isAuthenticated) {
-      next('/login')
+      loadingStore.isLoading = false // Set loading state to false 
+      next('/')
+      return
     } else {
       next()
+      return
     }
-  } else {
-    // For routes that don't require authentication
-    // If user is already authenticated and trying to access login page, redirect to dashboard
-    if (to.path === '/login' && userStore.isAuthenticated) {
+  } else if (to.path === '/' && userStore.isAuthenticated) {
+    loadingStore.isLoading = false // Set loading state to false
       next('/dashboard')
-    } else {
-      next()
+      return
     }
-  }
+    loadingStore.isLoading = false // Set loading state to false
+    next()
 })
 
+router.afterEach(() => {
+  const loadingStore = useLoadingStore()
+  loadingStore.isLoading = false // Set loading state to false
+})
 export default router

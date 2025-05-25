@@ -1,7 +1,7 @@
 <template>
   <aside
     :class="[
-      'bg-gray-100 h-screen p-4 shadow-md transition-all duration-300',
+      'bg-gray-100 h-full p-4 shadow-md transition-all duration-300',
       collapsed ? 'w-20' : 'w-64'
     ]"
   >
@@ -33,15 +33,15 @@ const collapsed = ref(false)
 const menu = [
   { 
     name: 'Dashboard', 
-    path: '/',
+    path: '/dashboard',
     emoji: '🏠'
   },
   {
     name: 'Pengadaan',
     emoji: '📦',
     children: [
-      { name: 'Barang Masuk', path: '/pengadaan-barang' },
-      { name: 'Riwayat', path: '/pengadaan-riwayat' }
+      { name: 'Daftar Barang', path: '/daftar-barang', emoji: '📥' },
+      { name: 'Riwayat', path: '/pengadaan-riwayat', emoji: '🕘' }
     ]
   },
   { 

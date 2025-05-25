@@ -29,7 +29,7 @@ API.interceptors.request.use(
       config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token)
 
       // Debug: Log the token being sent
-      console.log('Sending CSRF token:', decodeURIComponent(token))
+      // console.log('Sending CSRF token:', decodeURIComponent(token))
     }
     return config
   },

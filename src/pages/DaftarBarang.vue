@@ -1,4 +1,4 @@
-//PengadaanBarang.vue
+//DaftarBarang.vue
 <template>
   <DefaultLayout>
     <div v-if="alert.message" :class="alertClass" class="p-3 rounded mb-4">
@@ -6,7 +6,7 @@
     </div>
 
     <div class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl font-bold">Pengadaan Barang</h1>
+      <h1 class="text-2xl font-bold">Daftar Barang</h1>
       <button @click="toggleForm" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
         {{ showForm ? 'Tutup Form' : '+ Tambah Barang' }}
       </button>

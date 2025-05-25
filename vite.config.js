@@ -5,7 +5,7 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    host: '0.0.0.0',
+    host: '127.0.0.2',
     port: 5173,
     strictPort: true,
     proxy: {
@@ -13,41 +13,41 @@ export default defineConfig({
         target: 'https://sipb.crulxproject.com',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: 'localhost'
+        cookieDomainRewrite: '127.0.0.1'
       },
       '/sanctum': {
         target: 'https://sipb.crulxproject.com',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: 'localhost'
+        cookieDomainRewrite: '127.0.0.1'
       },
       '/login': {
         target: 'https://sipb.crulxproject.com',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: 'localhost'
+        cookieDomainRewrite: '127.0.0.1'
       },
       '/register': {
         target: 'https://sipb.crulxproject.com',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: 'localhost'
+        cookieDomainRewrite: '127.0.0.1'
       },
       '/forgot-password': {
         target: 'https://sipb.crulxproject.com',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: 'localhost'
+        cookieDomainRewrite: '127.0.0.1'
       },
       '/reset-password': {
         target: 'https://sipb.crulxproject.com',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: 'localhost'
+        cookieDomainRewrite: '127.0.0.1'
       }
     },
     cors: true,
-    allowedHosts: ['fe-sipb.crulxproject.com', 'localhost'],
+    allowedHosts: ['fe-sipb.crulxproject.com', '127.0.0.2'],
     historyApiFallback: true
   },
   plugins: [

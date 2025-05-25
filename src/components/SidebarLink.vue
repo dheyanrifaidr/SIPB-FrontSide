@@ -1,7 +1,23 @@
 <template>
   <div>
     <!-- Item utama -->
+    <RouterLink
+      v-if="item.path"
+      :to="item.path"
+      class="flex items-center px-4 py-2 cursor-pointer rounded transition-all"
+      :class="{
+        'bg-green-600 text-white': isActive,
+        'text-gray-700 hover:bg-green-100': !isActive
+      }"
+    >
+      <span class="text-xl">{{ item.emoji }}</span>
+      <span v-if="!collapsed">{{ item.name }}</span>
+      <span v-if="item.children && !collapsed" class="ml-auto text-sm">
+        {{ open ? '▾' : '▸' }}
+      </span>
+    </RouterLink>
     <div
+      v-else
       @click="handleClick"
       class="flex items-center px-4 py-2 cursor-pointer rounded transition-all"
       :class="{
@@ -9,6 +25,7 @@
         'text-gray-700 hover:bg-green-100': !isActive
       }"
     >
+      <span class="text-xl">{{ item.emoji }}</span>
       <span v-if="!collapsed">{{ item.name }}</span>
       <span v-if="item.children && !collapsed" class="ml-auto text-sm">
         {{ open ? '▾' : '▸' }}
@@ -30,6 +47,7 @@
           'text-gray-700': route.path !== child.path
         }"
       >
+        <span class="mr-2">{{ child.emoji || '•' }}</span>
         {{ child.name }}
       </RouterLink>
     </div>
