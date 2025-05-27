@@ -29,7 +29,38 @@ const routes = [
   {
     path: '/:pathMatch(.)',
     redirect: '/'
+  },
+  {
+  path: '/persetujuan',
+  name: 'PersetujuanPengadaan',
+  component: () => import('@/pages/PersetujuanPengadaan.vue'),
+  meta: { requiresAuth: true },
+  },
+  {
+  path: '/riwayat-pengajuan',
+  name: 'RiwayatPengajuan',
+  component: () => import('@/pages/RiwayatPengajuan.vue'),
+  meta: { requiresAuth: true },
+  },
+  {
+  path: '/pengadaan-disetujui',
+  name: 'PengadaanDisetujui',
+  component: () => import('@/pages/PengadaanDisetujui.vue'),
+  meta: { requiresAuth: true }
+  },
+  {
+  path: '/laporan',
+  name: 'LaporanPengadaan',
+  component: () => import('@/pages/LaporanPengadaan.vue'),
+  meta: { requiresAuth: true }
+  },
+  {
+  path: '/pengadaan/manual',
+  name: 'PengadaanManual',
+  component: () => import('@/pages/PengadaanManual.vue'),
+  meta: { requiresAuth: true }
   }
+
 ]
 
 const router = createRouter({
